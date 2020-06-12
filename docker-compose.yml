@@ -6,8 +6,8 @@ services:
     build: .
     environment:
       - GITLAB_ACCESS_TOKEN=
-      - FILTER_DATE_BEGIN=2020-05-01
-      - FILTER_DATE_END=2020-06-01
+      - FILTER_DATE_BEGIN=2020-05-09
+      - FILTER_DATE_END=2020-05-31
       - FILTER_AUTHOR=danismerim
       - FILTER_SEARCH=Bem
       - FILTER_ONLY_MEMBER=true
