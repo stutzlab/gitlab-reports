@@ -207,7 +207,6 @@ def report(entries, projects, args):
     df = pd.read_sql_query("select * from time_entries", conn)
     df.append(df.sum(numeric_only=True), ignore_index=True)
     df['time_spent'] = df['duration'].map(format_duration)
-    df.drop(['duration'], axis=0)
     print(df)
   elif args.report_type=='issue':
       print('NOT IMPLEMENTED YET')
