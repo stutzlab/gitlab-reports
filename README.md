@@ -33,6 +33,7 @@ services:
 
 * GITLAB_URL - . defaults to 'https://gitlab.com'
 * GITLAB_ACCESS_TOKEN - Gitlab personal access token. Can be acquired at Profile->Settings->Personal Access Token. required
+* REPORT_TYPE - report type. one of 'day', 'issue' or 'user'. defaults to 'day'
 * FILTER_DATE_BEGIN - only consider time spent on or after this date (format: YYYY-MM-DD)
 * FILTER_DATE_END - only consider time spent on or before this date (format: YYYY-MM-DD)
 * FILTER_AUTHOR - only consider time spent by this user

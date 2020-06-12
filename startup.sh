@@ -13,6 +13,11 @@ if [ "$GITLAB_ACCESS_TOKEN" == "" ]; then
     exit 1
 fi
 
+if [ "$REPORT_TYPE" == "" ]; then
+    echo "REPORT_TYPE is required"
+    exit 1
+fi
+
 if [ "$FILTER_DATE_BEGIN" != "" ]; then
     export FILTER_DATE_BEGIN1=" --filter-by-date-begin $FILTER_DATE_BEGIN"
 fi
@@ -33,9 +38,11 @@ if [ "$DEBUG" == "true" ]; then
     export DEBUG1=" --debug"
 fi
 
+set -x
 python3 /gitlab-cli-reports/main.py \
   --host-url $GITLAB_URL \
   --access-token $GITLAB_ACCESS_TOKEN \
+  --report-type $REPORT_TYPE \
   $FILTER_DATE_BEGIN1 \
   $FILTER_DATE_END1 \
   $FILTER_AUTHOR1 \

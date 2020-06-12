@@ -19,6 +19,8 @@
 import argparse
 import gitlab
 import re
+import sqlite3
+import pandas as pd
 # from _version import __version__
 
 
@@ -72,7 +74,7 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
               date_str = '<N/A>     '
 
             # Add a time_entry object to the result.
-            time_entries.append({ 'date': date_str, 'issue_iid': issue.iid, 'duration': duration })
+            time_entries.append({ 'date': date_str, 'issue_iid': issue.iid, 'duration': duration, 'issue_title': issue.title, 'note_author': note.author['username'] })
 
   return time_entries, projects
 
@@ -119,6 +121,10 @@ def parse_args():
                       default='https://gitlab.com',
                       help='url of the GitLab instance (default: https://gitlab.com)',
                       metavar='URL')
+  parser.add_argument('--report-type',
+                      default='day',
+                      help='Report type. One of "issue", "day" or "user". defaults to "day"',
+                      metavar='TYPE')
   parser.add_argument('--debug',
                       action='store_const',
                       const='True',
@@ -163,7 +169,20 @@ def parse_duration(str):
 
   return duration
 
-def report(entries, projects, args, by='entry'):
+def report(entries, projects, args):
+
+  if args.debug:
+    print('Preparing SQLite database with spent time entries for doing aggregations')
+  conn = sqlite3.connect(':memory:')
+  c = conn.cursor()
+  c.execute('''DROP TABLE IF EXISTS issue_spent''')
+  c.execute('''CREATE TABLE time_entries
+            (date text, issue_iid text, issue_title text, note_author text, duration integer)''')
+  for entry in entries:
+    c.execute("INSERT INTO time_entries VALUES ('%s','%s','%s','%s',%s)" %(entry['date'],entry['issue_iid'],entry['issue_title'],entry['note_author'],entry['duration']))
+  conn.commit()
+  if args.debug:
+    print('DB prepared')
 
   pstr = ''
   first = True
@@ -174,6 +193,7 @@ def report(entries, projects, args, by='entry'):
     else:
         pstr += ', ' + p.name
 
+  print('')
   print('-----------------------------------------------------')
   print('  Filter:')
   print('   - Author: %s' %(args.filter_by_author))
@@ -181,13 +201,28 @@ def report(entries, projects, args, by='entry'):
   print('   - Search terms: %s' %(args.filter_by_search))
   print('   - Projects: %s' %(pstr))
   print('-----------------------------------------------------')
+  print('')
 
-  if by == 'entry':
+  if args.report_type=='day':
+    df = pd.read_sql_query("select * from time_entries", conn)
+    df.append(df.sum(numeric_only=True), ignore_index=True)
+    df['time_spent'] = df['duration'].map(format_duration)
+    df.drop(['duration'], axis=0)
+    print(df)
+  elif args.report_type=='issue':
+      print('NOT IMPLEMENTED YET')
+  elif args.report_type=='user':
+      print('NOT IMPLEMENTED YET')
+      
+  conn.close()
+
+  print('PRINT OLD TABLE')
+  if args.report_type == 'day':
     for entry in entries:
       print('%s | %s | %s' %(entry['date'],
                              entry['issue_iid'],
                              format_duration(entry['duration'])))
-  elif by == 'date':
+  elif args.report_type == 'date':
     time_spent_per_day = {}
 
     # Group entries by date.
@@ -236,7 +271,7 @@ def report(entries, projects, args, by='entry'):
     print('| Total      | %s | %s |' %(format_duration(total, tabular=True).rjust(10), ' ' * issue_column_width))
     print('|------------|------------|-%s-|' %('-' * issue_column_width))
   else:
-    raise ArgumentError('Unspported value of `by`: %s' %(by))
+    raise ArgumentError('Unspported value of `by`: %s' %(args.report_type))
 
 
 #############################################################################
@@ -261,4 +296,4 @@ time_entries, projects = fetch_time_entries(gl,
 if args.debug:
     print('')
     print('Generating report...')
-report(time_entries, projects, args, by='date')
+report(time_entries, projects, args)

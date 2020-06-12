@@ -1,8 +1,10 @@
-FROM python:3.5.9-alpine3.12
-RUN apk add git
+FROM python:3.8.3-buster
+
+RUN apt-get update && apt-get install -y git
 
 ENV GITLAB_URL 'https://gitlab.com'
 ENV GITLAB_ACCESS_TOKEN ''
+ENV REPORT_TYPE 'day'
 ENV FILTER_DATE_BEGIN ''
 ENV FILTER_DATE_END ''
 ENV FILTER_AUTHOR ''
@@ -15,7 +17,7 @@ ENV DEBUG 'false'
 ADD /main.py /gitlab-cli-reports/main.py
 
 WORKDIR /gitlab-cli-reports
-RUN pip install gitpython python-gitlab
+RUN pip install gitpython python-gitlab pandas
 # RUN ./build.sh && mv dist/gitlab-cli-reports /bin/
 
 ADD /startup.sh /
