@@ -20,11 +20,17 @@ version: '3.6'
 services:
   gitlab-reports:
     image: flaviostutz/gitlab-reports
+    environment:
+      - JUPYTER_TOKEN=abc123
+    ports:
+      - 8888:8888
 ```
 
 * Run ```docker-compose up```
 
 * Open browser at http://localhost:8888
+
+* Type password "abc123"
 
 * Click on "gitlab-timespent.ipynb"
 
