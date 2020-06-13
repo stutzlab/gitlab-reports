@@ -5,7 +5,11 @@ This work began from the great job of https://gitlab.com/incomprehensibleaesthet
 
 ## Example report
 
+### Time/cost by issue
 <img src="sample1.png" width=600 />
+
+### Total by user
+<img src="sample2.png" width=600 />
 
 ## Usage
 
@@ -20,7 +24,17 @@ services:
 
 * Run ```docker-compose up```
 
-* See report on console output
+* Open browser at http://localhost:8888
+
+* Click on "gitlab-timespent.ipynb"
+
+* On first cell, set GITLAB_ACCESS_TOKEN to your token (get token in Gitlab -> Profile -> Settings -> Access Tokens)
+
+* Set FILTER_DATE_BEGIN, FILTER_DATE_END and FILTER_SEARCH to indicate the range of projects/dates you want to perform analysis
+
+* Click button "Run"
+
+* See results in Notebook cells
 
 ## ENVs
 
