@@ -19,7 +19,7 @@ This work began from the great job of https://gitlab.com/incomprehensibleaesthet
 version: '3.6'
 services:
   gitlab-reports:
-    image: flaviostutz/gitlab-reports
+    image: stutzlab/gitlab-reports
     environment:
       - JUPYTER_TOKEN=abc123
     ports:
