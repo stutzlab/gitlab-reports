@@ -1,6 +1,8 @@
 # gitlab-reports
 Creates reports on spent time for Gitlab issues by author.
 
+Used during month financial closing procedures in order to know how much to charge clients and how much to pay collaborators.
+
 This work began from the great job of https://gitlab.com/incomprehensibleaesthetics/gitlab-cli-reports, but then we went to a Jupyter version.
 
 ## Example report
