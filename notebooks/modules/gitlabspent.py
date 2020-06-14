@@ -2,7 +2,7 @@ import argparse
 import gitlab
 import re
 
-def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, filter_by_date_end=None, filter_by_project_membership=False, filter_by_search=None, debug=False):
+def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, filter_by_date_end=None, filter_by_project_membership=False, filter_by_search=None, filter_by_milestone=None, debug=False):
   time_entries = []
 
   # Iterate through projects and fetch their issues because directly fetching
@@ -46,9 +46,17 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
                 continue
             else:
               date_str = '<N/A>     '
+            
+            milestone_title = ''
+            if hasattr(issue, 'milestone'):
+              milestone_title = issue.milestone['title']
+            
+            if filter_by_milestone!=None:
+              if milestone_title!='' and milestone_title!=filter_by_milestone:
+                continue
 
             # Add a time_entry object to the result.
-            time_entries.append({ 'date': date_str, 'issue_iid': issue.iid, 'duration': duration, 'issue_title': issue.title, 'note_author': note.author['username'] })
+            time_entries.append({ 'date': date_str, 'issue_iid': issue.iid, 'duration': duration, 'issue_title': issue.title, 'note_author': note.author['username'], 'milestone_title': milestone_title })
 
   return time_entries, projects
 
