@@ -14,16 +14,17 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
     if debug:
       print('')
       print('Getting issues for project=%s' %(project.name), end =" ")
-    issues = project.issues.list(all=True)
+    issues = project.issues.list(all=True, lazy=False)
 
     for issue in issues:
       if debug:
         print('.', end =" ")
-      p_issue = gl.projects.get(issue.project_id, lazy=True).issues.get(issue.iid, lazy=True)
+#       p_issue = gl.projects.get(issue.project_id, lazy=True).issues.get(issue.iid, lazy=True)
+#       p_issue = issue
 
       # Fetch notes from oldest to newest. The order is important in case we
       # encounter a `/remove_time_spent` command.
-      notes = p_issue.notes.list(all=True, order_by='created_at', sort='asc')
+      notes = issue.notes.list(all=True, order_by='created_at', sort='asc')
 
       for note in notes:
         if note.system:
@@ -48,11 +49,11 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
               date_str = '<N/A>     '
             
             milestone_title = ''
-            if hasattr(issue, 'milestone'):
+            if issue.milestone!=None:
               milestone_title = issue.milestone['title']
             
             if filter_by_milestone!=None:
-              if milestone_title!='' and milestone_title!=filter_by_milestone:
+              if milestone_title=='' or milestone_title!=filter_by_milestone:
                 continue
 
             # Add a time_entry object to the result.
