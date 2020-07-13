@@ -9,12 +9,14 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
   # issues only returns issues created by the token owner.
   if debug:
     print('Getting projects. search=%s only_member=%s' %(filter_by_search, filter_by_project_membership))
-  projects = gl.projects.list(search=filter_by_search, membership=filter_by_project_membership, search_namespaces=True)
+  projects = gl.projects.list(search=filter_by_search, membership=filter_by_project_membership, search_namespaces=True, lazy=False, as_list=False)
   for project in projects:
     if debug:
       print('')
       print('Getting issues for project=%s' %(project.name), end =" ")
-    issues = project.issues.list(all=True, lazy=False)
+    issues = project.issues.list(all=True, lazy=False, as_list=False)
+    if debug:
+      print('(%d)'%len(issues), end = " ")
 
     for issue in issues:
       if debug:
@@ -24,7 +26,7 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
 
       # Fetch notes from oldest to newest. The order is important in case we
       # encounter a `/remove_time_spent` command.
-      notes = issue.notes.list(all=True, order_by='created_at', sort='asc')
+      notes = issue.notes.list(all=True, order_by='created_at', sort='asc', as_list=False)
 
       for note in notes:
         if note.system:
