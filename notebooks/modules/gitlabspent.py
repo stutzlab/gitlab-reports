@@ -9,7 +9,7 @@ def fetch_time_entries(gl, filter_by_author=None, filter_by_date_begin=None, fil
   # issues only returns issues created by the token owner.
   if debug:
     print('Getting projects. search=%s only_member=%s' %(filter_by_search, filter_by_project_membership))
-  projects = gl.projects.list(search=filter_by_search, membership=filter_by_project_membership)
+  projects = gl.projects.list(search=filter_by_search, membership=filter_by_project_membership, search_namespaces=True)
   for project in projects:
     if debug:
       print('')
